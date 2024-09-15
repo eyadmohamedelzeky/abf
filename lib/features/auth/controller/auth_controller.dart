@@ -1,6 +1,6 @@
+import 'dart:convert';
 import 'dart:developer';
 import 'package:abf_ather/core/app_varaible/app_varabile.dart';
-import 'package:abf_ather/core/cache/shared_pref.dart';
 import 'package:abf_ather/core/services/auth_service/check_otp.dart';
 import 'package:abf_ather/core/services/auth_service/complete_register_service.dart';
 import 'package:abf_ather/core/services/auth_service/login_service.dart';
@@ -26,7 +26,7 @@ import 'package:abf_ather/features/home/view/home.dart';
 import 'package:abf_ather/helper/toast_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:hive/hive.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class AuthController extends Cubit<AuthState> {
@@ -75,21 +75,23 @@ class AuthController extends Cubit<AuthState> {
     emit(LoginLoadingState());
 
     try {
+      // Call your API to perform login
       final loginResponseModel = await LoginApiService.login(request: request);
+
+      // If login is successful, emit success state
       emit(LoginSuccessState());
 
       // Parse the user data from the response
       final userModel =
           LoginResponseModel.fromJson(loginResponseModel.toJson());
-      log("userModel in login: ${userModel.toJson()}");
-      // Save user model data to SharedPreferences
-      await SharedPreferencesService.storeUserModel(userModel);
 
-      // Retrieve token for debugging purposes
-      final token = await SharedPreferencesService.getAccessToken();
-      log('Token retrieved: $token');
+      // Save user data to Hive
+      await saveUserData(userModel);
+
+      // Optionally, navigate to the home screen or another page
       Navigator.pushReplacementNamed(context, HomeScreen.id);
     } catch (error) {
+      // Handle login error
       String cleanMessage = formatErrorMessage(error.toString());
       ToastHelper.showToast(msg: cleanMessage, gravity: ToastGravity.BOTTOM);
 
@@ -97,17 +99,22 @@ class AuthController extends Cubit<AuthState> {
     }
   }
 
-  Future<void> _saveToken(String? token) async {
-    final prefs = await SharedPreferences.getInstance();
-    if (token != null) {
-      await prefs.setString('auth_token', token);
-    }
+  Future<void> saveUserData(LoginResponseModel userModel) async {
+    var authBox = Hive.box<String>('authBox');
+    await authBox.put('user_data', jsonEncode(userModel.toJson()));
   }
 
-  Future<String?> _getToken() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getString('auth_token');
-  }
+  // Future<void> _saveToken(String? token) async {
+  //   final prefs = await SharedPreferences.getInstance();
+  //   if (token != null) {
+  //     await prefs.setString('auth_token', token);
+  //   }
+  // }
+
+  // Future<String?> _getToken() async {
+  //   final prefs = await SharedPreferences.getInstance();
+  //   return prefs.getString('auth_token');
+  // }
 
   SendOtpResponse? sendOtpResponse;
   Future<void> sendOtp() async {

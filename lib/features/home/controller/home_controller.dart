@@ -1,16 +1,22 @@
+import 'dart:convert';
 import 'dart:developer';
 import 'package:abf_ather/core/services/home_service.dart';
+import 'package:abf_ather/core/services/soical_service.dart';
+import 'package:abf_ather/features/auth/model/login_response_model.dart';
 import 'package:abf_ather/features/home/controller/home_state.dart';
 import 'package:abf_ather/features/home/model/home_response.dart';
 import 'package:abf_ather/features/home/model/home_silder_response.dart';
 import 'package:abf_ather/features/home/model/product_brands_response_model.dart';
 import 'package:abf_ather/features/home/model/product_by_category_model.dart';
 import 'package:abf_ather/features/home/model/product_details_response.dart';
+import 'package:abf_ather/features/home/model/soical_response_model.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hive/hive.dart';
 
 class HomeController extends Cubit<HomeState> {
   HomeController() : super(HomeInitial());
   static HomeController get(context) => BlocProvider.of(context);
+  LoginResponseModel? userModel;
 
   HomeSilderResponse homeSilderResponse = HomeSilderResponse();
   HomeResponseModel homeResponse = HomeResponseModel();
@@ -20,6 +26,23 @@ class HomeController extends Cubit<HomeState> {
       ProductDetailsResponseModel();
   ProductByCategoryResponseModel productByCategoryResponse =
       ProductByCategoryResponseModel();
+
+  Future<void> fetchUserData() async {
+    emit(HomeLoadingState());
+    try {
+      var authBox = Hive.box<String>('authBox');
+      String? userDataJson = authBox.get('user_data');
+      if (userDataJson != null) {
+        userModel = LoginResponseModel.fromJson(jsonDecode(userDataJson));
+        emit(HomeLoadedState());
+      } else {
+        emit(HomeErrorState(error: 'User data not found'));
+      }
+    } catch (e) {
+      emit(HomeErrorState(error: e.toString()));
+    }
+  }
+
   Future<void> getHomeSilder() async {
     emit(HomeSilderLoadingState());
     await ApiHome.getHomeSilder().then((value) {
@@ -83,6 +106,20 @@ class HomeController extends Cubit<HomeState> {
     }).catchError((error) {
       log('error: ${error.toString()}');
       emit(ProductByCategoryErrorState(error: error));
+    });
+  }
+
+  SoicalResponseModel soicalResponseModel = SoicalResponseModel();
+  Future<void> getAllSoical() async {
+    emit(GetAllSoicalLoadingState());
+    await SoicalService.getAllSoical().then((value) {
+      soicalResponseModel = value;
+
+      log('GetAllSoicalResponse: ${productDetailsResponse.toJson()}');
+      emit(GetAllSoicalSuccessState());
+    }).catchError((error) {
+      log('error: ${error.toString()}');
+      emit(GetAllSoicalErrorState(error: error));
     });
   }
 }

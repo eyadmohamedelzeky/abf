@@ -643,6 +643,42 @@ class _ProductCategoryState extends State<ProductCategory> {
                           ),
                         ],
                       ),
+                      Expanded(
+                        child: GridView.count(
+                          crossAxisCount: 2, // 2 items per row
+                          crossAxisSpacing:
+                              8.0, // Space between items horizontally
+                          mainAxisSpacing:
+                              8.0, // Space between items vertically
+                          childAspectRatio:
+                              3 / 4, // Aspect ratio for each item (optional)
+                          children: List.generate(
+                            controller.homeResponse.data?.categories?.length ??
+                                0,
+                            (index) {
+                              final categories =
+                                  controller.homeResponse.data?.categories;
+                              if (categories != null && categories.isNotEmpty) {
+                                return ProductCard(
+                                    index: index,
+                                    name: categories
+                                        .map((e) => e.name ?? '')
+                                        .toList(),
+                                    image: categories
+                                        .map((e) => e.image ?? '')
+                                        .toList(),
+                                    imageBrand: const [], // Assuming there's a brand image field
+                                    rating: const []
+                                    // categories.map((e) => e.rating ?? 0
+                                    // ).toList(),
+                                    );
+                              }
+                              return const Center(
+                                  child: Text('No Categories Available'));
+                            },
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                   CustomButtonWithIcon(
@@ -741,9 +777,20 @@ class ProductCard extends StatelessWidget {
   const ProductCard({
     super.key,
     required this.index,
+    required this.name,
+    required this.image,
+    required this.imageBrand,
+    required this.rating,
+    this.price,
+    this.desc,
   });
-
   final int index;
+  final List<String> name;
+  final List<String> image;
+  final List<String> imageBrand;
+  final List rating;
+  final List? price;
+  final List? desc;
   @override
   Widget build(BuildContext context) {
     return Directionality(
@@ -760,40 +807,73 @@ class ProductCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Image(
-                image: AssetImage(ImagesConstants.hideAbf),
-                height: 60.h,
-                width: 80.w,
+              // Display the image, with a fallback for invalid or empty URLs
+              CachedNetworkImage(
+                width: double.infinity,
+                height: 40.h,
+                imageUrl: image.isNotEmpty && index < image.length
+                    ? image[index]
+                    : '',
+                imageBuilder: (context, imageProvider) => Container(
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                      image: imageProvider,
+                      fit: BoxFit.cover,
+                      colorFilter: const ColorFilter.mode(
+                        Colors.red,
+                        BlendMode.colorBurn,
+                      ),
+                    ),
+                  ),
+                ),
+                placeholder: (context, url) =>
+                    const Center(child: Text('Loading...')),
+                errorWidget: (context, url, error) => Image(
+                  image: AssetImage(ImagesConstants.abf),
+                  width: double.infinity,
+                ),
               ),
-              // CustomText(
-              //   fontSize: 18.sp,
-              //   text:,
-              //   fontWeight: FontWeight.w600,
-              // ),
-              //  CachedNetworkImage(
-              //       imageUrl:,
-              //       imageBuilder: (context, imageProvider) => Container(
-              //         decoration: BoxDecoration(
-              //           image: DecorationImage(
-              //               image: imageProvider,
-              //               fit: BoxFit.cover,
-              //               colorFilter: const ColorFilter.mode(
-              //                   Colors.red, BlendMode.colorBurn)),
-              //         ),
-              //       ),
-              //       placeholder: (context, url) => const Center(
-              //         child: Text('Loading...'),
-              //       ),
-              //       errorWidget: (context, url, error) => const Icon(Icons.error),
-              //     ),
-              // Image(
-              //   image: AssetImage(ImagesConstants.gree),
-              // ),
+              // Display the name, with a fallback for invalid or empty values
+              CustomText(
+                fontSize: 18.sp,
+                text: name.isNotEmpty && index < name.length
+                    ? name[index]
+                    : 'No Name Available',
+                fontWeight: FontWeight.w600,
+              ),
+              // Display brand image if available
+              CachedNetworkImage(
+                width: double.infinity,
+                height: 40.h,
+                imageUrl: imageBrand.isNotEmpty && index < imageBrand.length
+                    ? imageBrand[index]
+                    : '',
+                imageBuilder: (context, imageProvider) => Container(
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                      image: imageProvider,
+                      fit: BoxFit.cover,
+                      colorFilter: const ColorFilter.mode(
+                        Colors.red,
+                        BlendMode.colorBurn,
+                      ),
+                    ),
+                  ),
+                ),
+                placeholder: (context, url) =>
+                    const Center(child: Text('Loading...')),
+                errorWidget: (context, url, error) => Image(
+                  image: AssetImage(ImagesConstants.abf),
+                  width: double.infinity,
+                ),
+              ),
               Row(
                 children: [
                   RatingBar.builder(
                     itemSize: 20,
-                    initialRating: 3,
+                    initialRating: rating.isNotEmpty && index < rating.length
+                        ? rating[index].toDouble()
+                        : 0,
                     minRating: 1,
                     direction: Axis.horizontal,
                     allowHalfRating: true,
@@ -803,22 +883,26 @@ class ProductCard extends StatelessWidget {
                       Icons.star,
                       color: Colors.amber,
                     ),
-                    onRatingUpdate: (rating) {
-                      log("rating $rating");
+                    onRatingUpdate: (newRating) {
+                      log("Rating updated: $newRating");
                     },
                   ),
-                  //  CustomText(
-                  //   text: '(${})',
-                  // ),
+                  CustomText(
+                    text:
+                        '(${rating.isNotEmpty && index < rating.length ? rating[index] : '0'})',
+                  ),
                 ],
               ),
               CustomText(
-                text:
-                    'هناك حقيقة مثبتة منذ زمن طويل وهي أن المحتوى المقروء لصفحة ما  ',
+                text: desc?.isNotEmpty == true && index < desc!.length
+                    ? desc![index]
+                    : 'Default description text',
                 color: AppColors.greyColor,
               ),
               CustomText(
-                text: '2,750.00 ر.س',
+                text: price?.isNotEmpty == true && index < price!.length
+                    ? price![index]
+                    : '2,750.00 ر.س',
                 color: AppColors.orangeColor,
               ),
               Row(
@@ -834,10 +918,8 @@ class ProductCard extends StatelessWidget {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Text(
-                            'أضف للعربة',
-                            style: TextStyle(color: Colors.blue),
-                          ),
+                          Text('أضف للعربة',
+                              style: TextStyle(color: Colors.blue)),
                           Icon(Icons.shopping_cart, color: Colors.blue),
                         ],
                       ),
@@ -848,7 +930,7 @@ class ProductCard extends StatelessWidget {
                     icon: const Icon(Icons.favorite_border_outlined),
                   ),
                 ],
-              )
+              ),
             ],
           ),
         ),

@@ -51,3 +51,15 @@ class ProductByCategoryErrorState extends HomeState {
 
   ProductByCategoryErrorState({required this.error});
 }
+
+class HomeLoadedState extends HomeState {}
+
+class GetAllSoicalLoadingState extends HomeState {}
+
+class GetAllSoicalSuccessState extends HomeState {}
+
+class GetAllSoicalErrorState extends HomeState {
+  final String error;
+
+  GetAllSoicalErrorState({required this.error});
+}

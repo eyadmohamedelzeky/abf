@@ -1,11 +1,13 @@
 import 'dart:developer';
 
 import 'package:abf_ather/core/app_varaible/app_varabile.dart';
+import 'package:abf_ather/core/cache/hive_service.dart';
 import 'package:abf_ather/core/colors/app_colors.dart';
 import 'package:abf_ather/core/constants/app_constants.dart';
 import 'package:abf_ather/core/widgets/CutsomTextHeader.dart';
 import 'package:abf_ather/core/widgets/custom_list_view.dart';
 import 'package:abf_ather/core/widgets/custom_text.dart';
+import 'package:abf_ather/features/auth/model/login_response_model.dart';
 import 'package:abf_ather/features/home/controller/home_controller.dart';
 import 'package:abf_ather/features/home/controller/home_state.dart';
 import 'package:abf_ather/features/product_details/view/product_category.dart';
@@ -14,6 +16,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -23,6 +26,8 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  LoginResponseModel? userModel;
+
   int _selectedIndex = 0;
 
   void _onItemTapped(int index) {
@@ -53,6 +58,14 @@ class _HomeScreenState extends State<HomeScreen> {
         currentIndex = pageController!.page!.round();
       });
     });
+
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    HiveService userService = HiveService();
+    userModel = await userService.getUserData();
+    setState(() {}); // Update the UI after fetching user data
   }
 
   @override
@@ -158,11 +171,31 @@ class _HomeScreenState extends State<HomeScreen> {
                     padding: const EdgeInsets.all(16.0),
                     child: Row(
                       children: [
-                        CircleAvatar(
-                          radius: 20.r,
-                          backgroundColor: Colors.green,
-                          child: Image(
-                            image: AssetImage(ImagesConstants.whatsApp),
+                        InkWell(
+                          onTap: () async {
+                            // var whatsappEntry =
+                            //     home.soicalResponseModel.data?.firstWhere(
+                            //   (e) => e.name?.toLowerCase() == 'whatsapp',
+                            //   // Handle if no entry found
+                            // );
+                            // log("whatsappEntry.toString(): $whatsappEntry");
+                            // String whatsappUrl = whatsappEntry?.url ?? '';
+
+                            // if (whatsappUrl.isNotEmpty &&
+                            //     await canLaunchUrl(Uri.parse(whatsappUrl))) {
+                            //   await launchUrl(Uri.parse(whatsappUrl),
+                            //       mode: LaunchMode
+                            //           .externalApplication); // Ensures it opens in browser or app
+                            // } else {
+                            //   throw "Could not launch $whatsappUrl";
+                            // }
+                          },
+                          child: CircleAvatar(
+                            radius: 20.r,
+                            backgroundColor: Colors.green,
+                            child: Image(
+                              image: AssetImage(ImagesConstants.whatsApp),
+                            ),
                           ),
                         ),
                         SizedBox(
@@ -181,7 +214,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         const Spacer(),
                         CustomText(
-                          text: 'مرحبا , ${userModel?.data?.fName ?? ''} ',
+                          text:
+                              'مرحبا , ${userModel?.data?.fName ?? 'Guest '} ',
                           fontSize: 18.sp,
                           fontWeight: FontWeight.w600,
                         )
@@ -212,7 +246,6 @@ class _HomeScreenState extends State<HomeScreen> {
                             itemCount: home.homeSilderResponse.data?.length ??
                                 0, // Default to 0 if null
                             itemBuilder: (context, index, realIndex) {
-                              // Check if homeSilderResponse and data are not null
                               if (home.homeSilderResponse.data != null &&
                                   index <
                                       home.homeSilderResponse.data!.length) {
@@ -221,7 +254,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   height: 40.h,
                                   imageUrl: home.homeSilderResponse.data![index]
                                           .image ??
-                                      '', // Use null-aware operator
+                                      '',
                                   imageBuilder: (context, imageProvider) =>
                                       Container(
                                     decoration: BoxDecoration(
@@ -262,7 +295,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                 height: 10.h,
                               ),
                               Padding(
-                                padding: const EdgeInsets.all(8.0),
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 16.h, vertical: 10.h),
                                 child: CustomText(
                                   textAlign: TextAlign.center,
                                   text:
@@ -279,8 +313,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                   return Container(
                                     margin: const EdgeInsets.symmetric(
                                         horizontal: 4.0),
-                                    width: currentIndex == index ? 20.0 : 5.0,
-                                    height: 10.0,
+                                    width:
+                                        currentIndex == index ? 50.0.w : 3.0.w,
+                                    height: 7.0.h,
                                     decoration: BoxDecoration(
                                       color: currentIndex == index
                                           ? Colors.white

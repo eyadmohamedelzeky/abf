@@ -1,7 +1,9 @@
+import 'dart:convert';
 import 'dart:developer';
 import 'package:abf_ather/core/cache/shared_pref.dart';
 import 'package:abf_ather/features/auth/model/login_response_model.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 
 LoginResponseModel? userModel;
 
@@ -14,7 +16,10 @@ Future<void> updateUserModel(LoginResponseModel? user) async {
   } else {
     log('User or token is null');
   }
-
+Future<void> saveUserData(LoginResponseModel userModel) async {
+  var authBox = Hive.box<String>('authBox');
+  await authBox.put('user_data', jsonEncode(userModel.toJson()));
+}
 
 
 }

@@ -11,6 +11,7 @@ class ApiConstants {
   static String askPriceCategory = '/api/ask_price/categories';
   static String askPrice = '/api/ask_price/store';
   static String filterPath = '/api/product/filter';
+  static String soical = '/api/settings/social-urls';
   static String checkOtp(String email, String otp) =>
       '/api/check/otp?email=$email&otp=$otp';
   // static String productBrandsDetails(int id) =>

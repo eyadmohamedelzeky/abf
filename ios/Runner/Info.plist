@@ -53,5 +53,13 @@
 		</dict>
 		<key>UIStatusBarHidden</key>
 		<false/>
+
+		<!-- Added WhatsApp, SMS, and Tel URL Schemes -->
+		<key>LSApplicationQueriesSchemes</key>
+		<array>
+			<string>whatsapp</string>
+			<string>sms</string>
+			<string>tel</string>
+		</array>
 	</dict>
 </plist>

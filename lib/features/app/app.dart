@@ -33,11 +33,11 @@ class ABFApp extends StatelessWidget {
           child: MultiBlocProvider(
             providers: [
               BlocProvider(create: (context) => AuthController()),
-              BlocProvider(create: (context) => HomeController()),
+              BlocProvider(create: (context) => HomeController()..getAllSoical()),
               BlocProvider(create: (context) => ProductDetailsController()),
               BlocProvider(
-                  create: (context) =>
-                      AskPriceController()..askPriceDropDown()),
+                create: (context) => AskPriceController()..askPriceDropDown(),
+              ),
             ],
             child: MaterialApp(
               debugShowCheckedModeBanner: false,

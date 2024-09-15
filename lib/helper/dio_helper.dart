@@ -3,8 +3,7 @@ import 'dart:developer';
 import 'package:abf_ather/core/api/api_constants.dart';
 import 'package:bot_toast/bot_toast.dart';
 import 'package:dio/dio.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:hive/hive.dart';
 
 class DioHelper {
   static Dio? dio;
@@ -70,8 +69,7 @@ class DioHelper {
     Map<String, dynamic>? headers,
   }) async {
     try {
-      final token =
-          await _getToken(); // Retrieve the token from SharedPreferences
+      final token = await _getToken(); // Retrieve token from Hive
 
       final response = await dio!.post(
         path,
@@ -89,9 +87,6 @@ class DioHelper {
 
       log("Response headers: ${response.headers}");
       log("Response data: ${response.data}");
-      log("Response extra: ${response.extra}");
-      log("Response realUri: ${response.realUri}");
-      log("Response requestOptions.data: ${response.requestOptions.data}");
       log("Response requestOptions.headers: ${response.requestOptions.headers}");
 
       return response;
@@ -108,8 +103,10 @@ class DioHelper {
   }
 
   static Future<String?> _getToken() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getString('auth_token');
+    var authBox = Hive.box<String>('authBox');
+    String? token = authBox.get('auth_token');
+    log('Retrieved Token from Hive: $token');
+    return token;
   }
 
   static String _handleResponse(Response response) {

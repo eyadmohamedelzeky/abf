@@ -1,58 +1,37 @@
-import 'dart:developer';
 import 'package:abf_ather/bloc_observer.dart';
-import 'package:abf_ather/core/cache/shared_pref.dart';
+import 'package:abf_ather/core/cache/hive_service.dart';
 import 'package:abf_ather/features/app/app.dart';
+import 'package:abf_ather/features/auth/model/login_response_model.dart';
 import 'package:abf_ather/features/auth/view/login.dart';
 import 'package:abf_ather/features/home/view/home.dart';
 import 'package:abf_ather/helper/dio_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
-
-// void main() async {
-//   if (userModel != null) {
-//     await SharedPreferencesService.storeAccessToken(userModel!.data!.token!);
-//     var token = await SharedPreferencesService.getAccessToken();
-//     log('token In main:$token');
-//   }
-//   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
-//   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
-//   DioHelper.init();
-//   Bloc.observer = MyBlocObserver();
-//   runApp( ABFApp(
-//     initialRoute: userModel != null ? HomeScreen.id : LoginScreen.id
-//   ));
-//   FlutterNativeSplash.remove();
-//   // WidgetsFlutterBinding.ensureInitialized();
-//   // DioHelper.init();
-//   // Bloc.observer = MyBlocObserver();
-//   // FlutterNativeSplash.preserve(
-//   //     widgetsBinding: WidgetsFlutterBinding.ensureInitialized());
-//   // String? token = await SharedPreferencesService.getAccessToken();
-//   // if (token != null) {
-//   //   log('Token found: $token');
-//   // }
-//   // FlutterNativeSplash.remove();
-//   // runApp(const ABFApp(
-//   //     // initialRoute: token != null ? HomeScreen.id : LoginScreen.id
-//   //     ));
-// }
+import 'package:hive_flutter/hive_flutter.dart';
 
 void main() async {
-  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
-  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize Hive
+  await Hive.initFlutter();
+
+  // Open the auth box
+  await Hive.openBox<String>('authBox');
 
   // Initialize DioHelper and Bloc observer
   DioHelper.init();
   Bloc.observer = MyBlocObserver();
 
-  // Check if token is already saved in SharedPreferences
-  String? token = await SharedPreferencesService.getAccessToken();
-  log('Token in main: $token');
+  // Check if user data exists in Hive
+  HiveService userService = HiveService();
+  LoginResponseModel? userData = await userService.getUserData();
 
-  // Decide the initial route based on whether the token exists
+  // Decide the initial route based on whether user data exists
   String initialRoute =
-      (token != null && token.isNotEmpty) ? HomeScreen.id : LoginScreen.id;
+      (userData != null && userData.data?.token?.isNotEmpty == true)
+          ? HomeScreen.id
+          : LoginScreen.id;
 
   runApp(ABFApp(initialRoute: initialRoute));
 
