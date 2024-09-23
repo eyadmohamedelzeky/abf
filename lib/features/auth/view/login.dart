@@ -126,7 +126,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                   await authController.login(
                                     context,
                                     request: LoginRequestModel(
-
                                         email:
                                             authController.emailController.text,
                                         password: authController

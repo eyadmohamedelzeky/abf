@@ -1,7 +1,4 @@
-import 'dart:developer';
-
 import 'package:abf_ather/core/app_varaible/app_varabile.dart';
-import 'package:abf_ather/core/cache/hive_service.dart';
 import 'package:abf_ather/core/colors/app_colors.dart';
 import 'package:abf_ather/core/constants/app_constants.dart';
 import 'package:abf_ather/core/widgets/CutsomTextHeader.dart';
@@ -16,7 +13,6 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -51,6 +47,7 @@ class _HomeScreenState extends State<HomeScreen> {
     HomeController.get(context).getHomeSilder();
     HomeController.get(context).getHome();
     HomeController.get(context).getProductBrands();
+    HomeController.get(context).getFavouriteProducts();
     pageController = PageController();
 
     pageController!.addListener(() {
@@ -58,14 +55,6 @@ class _HomeScreenState extends State<HomeScreen> {
         currentIndex = pageController!.page!.round();
       });
     });
-
-    _loadUserData();
-  }
-
-  Future<void> _loadUserData() async {
-    HiveService userService = HiveService();
-    userModel = await userService.getUserData();
-    setState(() {}); // Update the UI after fetching user data
   }
 
   @override
@@ -334,13 +323,19 @@ class _HomeScreenState extends State<HomeScreen> {
                   SizedBox(
                     height: 20.h,
                   ),
-                  const GridViewBody(),
-                  const Padding(
-                    padding: EdgeInsets.all(16),
-                    child: CustomTitleHeader(
-                      text: "الأكثر مبيعا",
-                      description: "أكثر منتجاتنا تحقيقا للمبيعات",
-                    ),
+                  BlocBuilder<HomeController, HomeState>(
+                    builder: (context, state) {
+                      final home = HomeController.get(context);
+                      return const GridViewBody(
+                        // id: home.favouriteProductsResponseModel.data?.firstWhere((e)=>e.products?.map((v) => v.id)== )
+
+                        id: 141,
+                      );
+                    },
+                  ),
+                  const CustomTitleHeader(
+                    text: "الأكثر مبيعا",
+                    description: "أكثر منتجاتنا تحقيقا للمبيعات",
                   ),
                   SizedBox(
                     height: 10.h,
@@ -462,21 +457,22 @@ class CustomTitleHeader extends StatelessWidget {
 class GridViewBody extends StatelessWidget {
   const GridViewBody({
     super.key,
+    required this.id,
   });
-
+  final int id;
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<HomeController, HomeState>(
       builder: (context, state) {
         final homeController = HomeController.get(context);
         return SizedBox(
-          height: MediaQuery.of(context).size.height,
+          height: MediaQuery.of(context).size.height * 1.5,
           child: InkWell(
             onTap: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => const ProductCategory(),
+                  builder: (context) => ProductCategory(productid: id),
                 ),
               );
             },

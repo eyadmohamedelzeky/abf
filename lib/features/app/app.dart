@@ -33,7 +33,10 @@ class ABFApp extends StatelessWidget {
           child: MultiBlocProvider(
             providers: [
               BlocProvider(create: (context) => AuthController()),
-              BlocProvider(create: (context) => HomeController()..getAllSoical()),
+              BlocProvider(
+                  create: (context) => HomeController()..getFavouriteProducts()
+                  // ..getAllSoical()
+                  ),
               BlocProvider(create: (context) => ProductDetailsController()),
               BlocProvider(
                 create: (context) => AskPriceController()..askPriceDropDown(),

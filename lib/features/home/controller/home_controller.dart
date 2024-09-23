@@ -4,6 +4,7 @@ import 'package:abf_ather/core/services/home_service.dart';
 import 'package:abf_ather/core/services/soical_service.dart';
 import 'package:abf_ather/features/auth/model/login_response_model.dart';
 import 'package:abf_ather/features/home/controller/home_state.dart';
+import 'package:abf_ather/features/home/model/favourite_products_response_model.dart';
 import 'package:abf_ather/features/home/model/home_response.dart';
 import 'package:abf_ather/features/home/model/home_silder_response.dart';
 import 'package:abf_ather/features/home/model/product_brands_response_model.dart';
@@ -27,21 +28,6 @@ class HomeController extends Cubit<HomeState> {
   ProductByCategoryResponseModel productByCategoryResponse =
       ProductByCategoryResponseModel();
 
-  Future<void> fetchUserData() async {
-    emit(HomeLoadingState());
-    try {
-      var authBox = Hive.box<String>('authBox');
-      String? userDataJson = authBox.get('user_data');
-      if (userDataJson != null) {
-        userModel = LoginResponseModel.fromJson(jsonDecode(userDataJson));
-        emit(HomeLoadedState());
-      } else {
-        emit(HomeErrorState(error: 'User data not found'));
-      }
-    } catch (e) {
-      emit(HomeErrorState(error: e.toString()));
-    }
-  }
 
   Future<void> getHomeSilder() async {
     emit(HomeSilderLoadingState());
@@ -81,20 +67,19 @@ class HomeController extends Cubit<HomeState> {
       emit(ProductsBrandsErrorState(error: error));
     });
   }
-  //   Future<void> geProductDetails({required int id}) async {
-  //   emit(ProductDetailsLoadingState());
-  //   await ApiHome.getProductsDetails(
-  //     id
-  //   ).then((value) {
-  //     productDetailsResponse = value;
-
-  //     log('productDetailsResponse: ${productDetailsResponse?.toJson()}');
-  //     emit(ProductDetailsSuccessState());
-  //   }).catchError((error) {
-  //     log('error: ${error.toString()}');
-  //     emit(ProductDetailsErrorState(error: error));
-  //   });
-  // }
+    Future<void> getProductDetails({required int id}) async {
+    emit(ProductDetailsLoadingState());
+    await ApiHome.getProductsDetails(
+      id
+    ).then((value) {
+      productDetailsResponse = value;
+      log('productDetailsResponse: ${productDetailsResponse.toJson()}');
+      emit(ProductDetailsSuccessState());
+    }).catchError((error) {
+      log('error: ${error.toString()}');
+      emit(ProductDetailsErrorState(error: error));
+    });
+  }
 
   Future<void> geProductByCategory({required int id}) async {
     emit(ProductByCategoryLoadingState());
@@ -122,4 +107,18 @@ class HomeController extends Cubit<HomeState> {
       emit(GetAllSoicalErrorState(error: error));
     });
   }
+FavouriteProductsResponseModel favouriteProductsResponseModel = FavouriteProductsResponseModel();
+Future<void> getFavouriteProducts() async {
+    emit(FavouriteProductsLoadingState());
+    await ApiHome.getFavouriteProducts().then((value) {
+      favouriteProductsResponseModel = value;
+      log('FavouriteProductsResponse: ${homeSilderResponse.toJson()}');
+      emit(FavouriteProductsSuccessState());
+    }).catchError((error) {
+      log('error: ${error.toString()}');
+      emit(FavouriteProductsErrorState(error: error));
+    });
+  }
+
+
 }

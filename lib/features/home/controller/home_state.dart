@@ -63,3 +63,13 @@ class GetAllSoicalErrorState extends HomeState {
 
   GetAllSoicalErrorState({required this.error});
 }
+
+class FavouriteProductsLoadingState extends HomeState {}
+
+class FavouriteProductsSuccessState extends HomeState {}
+
+class FavouriteProductsErrorState extends HomeState {
+  final String error;
+
+  FavouriteProductsErrorState({required this.error});
+}

@@ -1,6 +1,6 @@
-import 'dart:convert';
 import 'dart:developer';
 import 'package:abf_ather/core/app_varaible/app_varabile.dart';
+import 'package:abf_ather/core/helpers/hive_helper.dart';
 import 'package:abf_ather/core/services/auth_service/check_otp.dart';
 import 'package:abf_ather/core/services/auth_service/complete_register_service.dart';
 import 'package:abf_ather/core/services/auth_service/login_service.dart';
@@ -13,7 +13,6 @@ import 'package:abf_ather/features/auth/model/check_otp_response.dart';
 import 'package:abf_ather/features/auth/model/complete_register_request.dart';
 import 'package:abf_ather/features/auth/model/complete_register_response.dart';
 import 'package:abf_ather/features/auth/model/login_request_model.dart';
-import 'package:abf_ather/features/auth/model/login_response_model.dart';
 import 'package:abf_ather/features/auth/model/register_new_account_request.dart';
 import 'package:abf_ather/features/auth/model/register_new_account_response.dart';
 import 'package:abf_ather/features/auth/model/reset_password_request.dart';
@@ -26,7 +25,6 @@ import 'package:abf_ather/features/home/view/home.dart';
 import 'package:abf_ather/helper/toast_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:hive/hive.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class AuthController extends Cubit<AuthState> {
@@ -73,47 +71,34 @@ class AuthController extends Cubit<AuthState> {
   Future<void> login(BuildContext context,
       {required LoginRequestModel request}) async {
     emit(LoginLoadingState());
+    await LoginApiService.login(request: request)
+        .then((loginResponseModel) async {
+      // Save the token to Hive
+      await HiveHelper.addToHive(
+          key: 'token', value: loginResponseModel.data?.token ?? '');
 
-    try {
-      // Call your API to perform login
-      final loginResponseModel = await LoginApiService.login(request: request);
-
-      // If login is successful, emit success state
       emit(LoginSuccessState());
-
-      // Parse the user data from the response
-      final userModel =
-          LoginResponseModel.fromJson(loginResponseModel.toJson());
-
-      // Save user data to Hive
-      await saveUserData(userModel);
-
-      // Optionally, navigate to the home screen or another page
-      Navigator.pushReplacementNamed(context, HomeScreen.id);
-    } catch (error) {
-      // Handle login error
+      await Navigator.pushReplacementNamed(context, HomeScreen.id);
+    }).catchError((error) {
       String cleanMessage = formatErrorMessage(error.toString());
       ToastHelper.showToast(msg: cleanMessage, gravity: ToastGravity.BOTTOM);
-
       emit(LoginErrorState(error: error.toString()));
-    }
+    });
   }
 
-  Future<void> saveUserData(LoginResponseModel userModel) async {
-    var authBox = Hive.box<String>('authBox');
-    await authBox.put('user_data', jsonEncode(userModel.toJson()));
-  }
+  // Future<void> login(BuildContext context,
+  //     {required LoginRequestModel request}) async {
+  //   emit(LoginLoadingState());
+  //   await LoginApiService.login(request: request)
+  //       .then((loginResponseModel) async {
+  //     emit(LoginSuccessState());
+  //     await Navigator.pushReplacementNamed(context, HomeScreen.id);
+  //   }).catchError((error) {
+  //     String cleanMessage = formatErrorMessage(error.toString());
+  //     ToastHelper.showToast(msg: cleanMessage, gravity: ToastGravity.BOTTOM);
 
-  // Future<void> _saveToken(String? token) async {
-  //   final prefs = await SharedPreferences.getInstance();
-  //   if (token != null) {
-  //     await prefs.setString('auth_token', token);
-  //   }
-  // }
-
-  // Future<String?> _getToken() async {
-  //   final prefs = await SharedPreferences.getInstance();
-  //   return prefs.getString('auth_token');
+  //     emit(LoginErrorState(error: error.toString()));
+  //   });
   // }
 
   SendOtpResponse? sendOtpResponse;

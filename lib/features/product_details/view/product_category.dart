@@ -20,7 +20,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 class ProductCategory extends StatefulWidget {
   const ProductCategory({
     super.key,
+    this.productid,
   });
+  final int? productid;
   static const String id = "ProductCategory";
   @override
   State<ProductCategory> createState() => _ProductCategoryState();
@@ -630,7 +632,8 @@ class _ProductCategoryState extends State<ProductCategory> {
                           ),
                           CustomTextHeader(
                             fontSize: 20.sp,
-                            text: 'مكيف جداري',
+                            text:
+                                '${controller.productDetailsResponse.data?.name}',
                           ),
                           IconButton(
                             onPressed: () {

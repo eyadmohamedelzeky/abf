@@ -12,12 +12,14 @@ class ApiConstants {
   static String askPrice = '/api/ask_price/store';
   static String filterPath = '/api/product/filter';
   static String soical = '/api/settings/social-urls';
+  static String productDetails(int id) => '/api/product/details?product_id=$id';
+  static String accessoriesDetails(int id) => '/api/accessories-details/$id';
   static String checkOtp(String email, String otp) =>
       '/api/check/otp?email=$email&otp=$otp';
+  static String favouriteProducts = '/api/favourites';
   // static String productBrandsDetails(int id) =>
   //     'api/product/details?product_category_id=$id';
-  static String productDetails(int id) =>
-      '/api/product/details?product_category_id=$id';
+  //
   static String productByCategory(int id) =>
       '/api/product/category?category_id=$id';
 
