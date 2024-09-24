@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:developer';
 import 'package:abf_ather/core/services/home_service.dart';
 import 'package:abf_ather/core/services/soical_service.dart';
@@ -12,7 +11,6 @@ import 'package:abf_ather/features/home/model/product_by_category_model.dart';
 import 'package:abf_ather/features/home/model/product_details_response.dart';
 import 'package:abf_ather/features/home/model/soical_response_model.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:hive/hive.dart';
 
 class HomeController extends Cubit<HomeState> {
   HomeController() : super(HomeInitial());
@@ -27,7 +25,6 @@ class HomeController extends Cubit<HomeState> {
       ProductDetailsResponseModel();
   ProductByCategoryResponseModel productByCategoryResponse =
       ProductByCategoryResponseModel();
-
 
   Future<void> getHomeSilder() async {
     emit(HomeSilderLoadingState());
@@ -67,11 +64,10 @@ class HomeController extends Cubit<HomeState> {
       emit(ProductsBrandsErrorState(error: error));
     });
   }
-    Future<void> getProductDetails({required int id}) async {
+
+  Future<void> getProductDetails({required int id}) async {
     emit(ProductDetailsLoadingState());
-    await ApiHome.getProductsDetails(
-      id
-    ).then((value) {
+    await ApiHome.getProductsDetails(id).then((value) {
       productDetailsResponse = value;
       log('productDetailsResponse: ${productDetailsResponse.toJson()}');
       emit(ProductDetailsSuccessState());
@@ -81,7 +77,7 @@ class HomeController extends Cubit<HomeState> {
     });
   }
 
-  Future<void> geProductByCategory({required int id}) async {
+  Future<void> getProductByCategory({required int id}) async {
     emit(ProductByCategoryLoadingState());
     await ApiHome.getProductsByCategory(id).then((value) {
       productByCategoryResponse = value;
@@ -107,8 +103,10 @@ class HomeController extends Cubit<HomeState> {
       emit(GetAllSoicalErrorState(error: error));
     });
   }
-FavouriteProductsResponseModel favouriteProductsResponseModel = FavouriteProductsResponseModel();
-Future<void> getFavouriteProducts() async {
+
+  FavouriteProductsResponseModel favouriteProductsResponseModel =
+      FavouriteProductsResponseModel();
+  Future<void> getFavouriteProducts() async {
     emit(FavouriteProductsLoadingState());
     await ApiHome.getFavouriteProducts().then((value) {
       favouriteProductsResponseModel = value;
@@ -119,6 +117,4 @@ Future<void> getFavouriteProducts() async {
       emit(FavouriteProductsErrorState(error: error));
     });
   }
-
-
 }

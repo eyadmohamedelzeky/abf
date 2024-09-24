@@ -1,14 +1,16 @@
 class ProductByCategoryResponseModel {
   String? message;
   int? status;
-  Data? data;
+  DataProductByCategoryResponseModel? data;
 
   ProductByCategoryResponseModel({this.message, this.status, this.data});
 
   ProductByCategoryResponseModel.fromJson(Map<String, dynamic> json) {
     message = json['message'];
     status = json['status'];
-    data = json['data'] != null ? Data.fromJson(json['data']) : null;
+    data = json['data'] != null
+        ? DataProductByCategoryResponseModel.fromJson(json['data'])
+        : null;
   }
 
   Map<String, dynamic> toJson() {

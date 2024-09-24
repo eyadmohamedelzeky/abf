@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:abf_ather/core/app_varaible/app_varabile.dart';
 import 'package:abf_ather/core/colors/app_colors.dart';
 import 'package:abf_ather/core/constants/app_constants.dart';
@@ -325,12 +327,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   BlocBuilder<HomeController, HomeState>(
                     builder: (context, state) {
-                      final home = HomeController.get(context);
-                      return const GridViewBody(
-                        // id: home.favouriteProductsResponseModel.data?.firstWhere((e)=>e.products?.map((v) => v.id)== )
-
-                        id: 141,
-                      );
+                      return const GridViewBody();
                     },
                   ),
                   const CustomTitleHeader(
@@ -457,9 +454,9 @@ class CustomTitleHeader extends StatelessWidget {
 class GridViewBody extends StatelessWidget {
   const GridViewBody({
     super.key,
-    required this.id,
+    // required this.id,
   });
-  final int id;
+  // final int id;
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<HomeController, HomeState>(
@@ -467,24 +464,28 @@ class GridViewBody extends StatelessWidget {
         final homeController = HomeController.get(context);
         return SizedBox(
           height: MediaQuery.of(context).size.height * 1.5,
-          child: InkWell(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ProductCategory(productid: id),
-                ),
-              );
-            },
-            child: GridView.count(
-              physics: const NeverScrollableScrollPhysics(),
-              crossAxisCount: 2,
-              padding: const EdgeInsets.all(8.0),
-              children: (homeController.homeResponse.data != null)
-                  ? List.generate(
-                      homeController.homeResponse.data!.categories!.length,
-                      (index) {
-                        return Container(
+          child: GridView.count(
+            physics: const NeverScrollableScrollPhysics(),
+            crossAxisCount: 2,
+            padding: const EdgeInsets.all(8.0),
+            children: (homeController.homeResponse.data != null)
+                ? List.generate(
+                    homeController.homeResponse.data!.categories!.length,
+                    (index) {
+                      return InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ProductCategory(
+                                  name: homeController.homeResponse.data!
+                                      .categories?[index].name,
+                                  catoreyId: homeController.homeResponse.data!
+                                      .categories?[index].id),
+                            ),
+                          );
+                        },
+                        child: Container(
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(10.r),
                             color: hexToColor(homeController
@@ -528,11 +529,11 @@ class GridViewBody extends StatelessWidget {
                               ],
                             ),
                           ),
-                        );
-                      },
-                    )
-                  : [],
-            ),
+                        ),
+                      );
+                    },
+                  )
+                : [],
           ),
         );
       },
