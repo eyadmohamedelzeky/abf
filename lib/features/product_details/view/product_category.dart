@@ -141,7 +141,6 @@ class CustomAppBarForProductCardItem extends StatelessWidget {
 
   final HomeController controller;
   final ProductCategory widget;
-
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -150,18 +149,22 @@ class CustomAppBarForProductCardItem extends StatelessWidget {
         InkWell(
           onTap: () {
             showBottomSheet(
+              shape: OutlineInputBorder(
+                borderSide: BorderSide.none,
+                borderRadius: BorderRadius.circular(20.r),
+              ),
+              backgroundColor: Colors.white,
+              elevation: 7,
               context: context,
               builder: (context) {
                 return BlocConsumer<ProductDetailsController,
                     ProductDetailsState>(
-                  listener: (context, state) {
-                    // TODO: implement listener
-                  },
+                  listener: (context, state) {},
                   builder: (context, state) {
                     final productDetailsController =
                         ProductDetailsController.get(context);
                     return Padding(
-                      padding: const EdgeInsets.all(8.0),
+                      padding: const EdgeInsets.all(16.0),
                       child: Directionality(
                         textDirection: TextDirection.rtl,
                         child: Column(
@@ -203,19 +206,28 @@ class CustomAppBarForProductCardItem extends StatelessWidget {
                               text: ' حسب المبيعات',
                               color: AppColors.greyColor,
                             ),
-                            CheckboxListTile.adaptive(
-                            
-                              activeColor: AppColors.orangeColor,
-                              checkColor: AppColors.whiteColor,
-                              contentPadding: EdgeInsets.zero,
-                              value:
-                                  productDetailsController.productMoreThanBuy,
-                              onChanged: (value) {
-                                productDetailsController
-                                    .toggleProductMoreThanBuy(value!);
-                              },
-                              title: const CustomText(
-                                text: 'المنتجات الأكثر مبيعا',
+                            Directionality(
+                              textDirection: TextDirection.ltr,
+                              child: Row(
+                                children: [
+                                  const Expanded(child: SizedBox()),
+                                  Expanded(
+                                    child: CheckboxListTile.adaptive(
+                                      activeColor: AppColors.orangeColor,
+                                      checkColor: AppColors.whiteColor,
+                                      contentPadding: EdgeInsets.zero,
+                                      value: productDetailsController
+                                          .productMoreThanBuy,
+                                      onChanged: (value) {
+                                        productDetailsController
+                                            .toggleProductMoreThanBuy(value!);
+                                      },
+                                      title: const Text(
+                                        'المنتجات الأكثر مبيعا',
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                             Divider(
@@ -242,9 +254,8 @@ class CustomAppBarForProductCardItem extends StatelessWidget {
                                             .handleRadioValueChangeForPrice(
                                                 value!);
                                       },
-                                      title: Text(
+                                      title: const Text(
                                         'من الأقل إلى الأعلى سعرا',
-                                        style: TextStyle(fontSize: 15.sp),
                                       ),
                                     ),
                                   ),
@@ -258,9 +269,8 @@ class CustomAppBarForProductCardItem extends StatelessWidget {
                                             .handleRadioValueChangeForPrice(
                                                 value!);
                                       },
-                                      title: Text(
+                                      title: const Text(
                                         'من الأعلى إلى الأقل سعرا',
-                                        style: TextStyle(fontSize: 15.sp),
                                       ),
                                     ),
                                   ),
@@ -288,9 +298,8 @@ class CustomAppBarForProductCardItem extends StatelessWidget {
                                             .handleRadioValueChangeForRating(
                                                 value!);
                                       },
-                                      title: CustomText(
-                                        text: 'من الأقل إلى الأعلى تقييما',
-                                        fontSize: 10.sp,
+                                      title: const Text(
+                                        'من الأقل إلى الأعلى تقييما',
                                       ),
                                     ),
                                   ),
@@ -305,9 +314,8 @@ class CustomAppBarForProductCardItem extends StatelessWidget {
                                             .handleRadioValueChangeForRating(
                                                 value!);
                                       },
-                                      title: CustomText(
-                                        text: 'من الأعلى إلى الأقل تقييما',
-                                        fontSize: 10.sp,
+                                      title: const Text(
+                                        'من الأعلى إلى الأقل تقييما',
                                       ),
                                     ),
                                   ),
@@ -321,6 +329,7 @@ class CustomAppBarForProductCardItem extends StatelessWidget {
                                 ? const CircularProgressIndicator()
                                 : CustomButton(
                                     onPressed: () async {
+                                      // Collect selected brand IDs
                                       List<int> selectedBrandIds = [];
                                       for (int i = 0;
                                           i <
@@ -335,24 +344,86 @@ class CustomAppBarForProductCardItem extends StatelessWidget {
                                               .toList()[i]!);
                                         }
                                       }
+
+                                      // Check if any essential data is missing or invalid
+                                      if (selectedBrandIds.isEmpty) {
+                                        // Optionally, show a message to the user
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          const SnackBar(
+                                              content: Text(
+                                                  'Please select at least one brand')),
+                                        );
+                                        return; // Prevent sending the request
+                                      }
+                                      if (productDetailsController
+                                              .productMoreThanBuy ==
+                                          false) {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          const SnackBar(
+                                              content: Text(
+                                                  'Please select product More Than Buy ')),
+                                        );
+                                      }
+
+                                      // If all checks pass, send the request
                                       await productDetailsController
                                           .filterProducts(
                                         request: FilterRequestModel(
-                                            categoryId: controller
-                                                .homeResponse.data!.categories!
-                                                .map((e) => e.id!)
-                                                .first,
-                                            brandsId: selectedBrandIds,
-                                            bestseller: productDetailsController
-                                                    .productMoreThanBuy
-                                                ? 1
-                                                : 0,
-                                            price: productDetailsController
-                                                .selectedValueForPrice,
-                                            rate: productDetailsController
-                                                .selectedValueForRating),
+                                          categoryId: controller
+                                              .homeResponse.data!.categories!
+                                              .map((e) => e.id!)
+                                              .first,
+                                          brandsId: selectedBrandIds,
+                                          bestseller: productDetailsController
+                                                  .productMoreThanBuy
+                                              ? 1
+                                              : 0,
+                                          price: productDetailsController
+                                              .selectedValueForPrice,
+                                          rate: productDetailsController
+                                              .selectedValueForRating,
+                                        ),
                                       );
                                     },
+                                    // onPressed: () async {
+                                    //   List<int> selectedBrandIds = [];
+                                    //   for (int i = 0;
+                                    //       i <
+                                    //           productDetailsController
+                                    //               .logoChecked.length;
+                                    //       i++) {
+                                    //     if (productDetailsController
+                                    //         .logoChecked[i]) {
+                                    //       selectedBrandIds.add(controller
+                                    //           .productBrandsResponse.data!
+                                    //           .map((e) => e.id)
+                                    //           .toList()[i]!);
+                                    //     }
+                                    //   }
+                                    //   await productDetailsController
+                                    //       .filterProducts(
+                                    //     request: FilterRequestModel(
+                                    //         categoryId: controller
+                                    //             .homeResponse
+                                    //             .data!
+                                    //             .categories!
+                                    //             .map((e) => e.id!)
+                                    //             .first,
+                                    //         brandsId: selectedBrandIds,
+                                    //         bestseller:
+                                    //             productDetailsController
+                                    //                     .productMoreThanBuy
+                                    //                 ? 1
+                                    //                 : 0,
+                                    //         price: productDetailsController
+                                    //             .selectedValueForPrice,
+                                    //         rate: productDetailsController
+                                    //             .selectedValueForRating,
+                                    //             ),
+                                    //   );
+                                    // },
                                     text: 'فلترة',
                                   ),
                           ],
@@ -644,61 +715,64 @@ class _CustomGridViewForCheckBoxState extends State<CustomGridViewForCheckBox> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: GridView.builder(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        padding: EdgeInsets.zero,
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 3,
-          crossAxisSpacing: 0, // Reduced spacing between columns
-          mainAxisSpacing: 0, // Reduced spacing between rows
-          childAspectRatio: 3 / 1,
-        ),
-        itemCount: widget.checkBoxValues.length,
-        itemBuilder: (context, index) {
-          return CheckboxListTile(
-            side: const BorderSide(color: Colors.grey),
-            visualDensity: VisualDensity.standard,
-            activeColor: AppColors.orangeColor,
-            checkColor: AppColors.whiteColor,
-            dense: false,
-            contentPadding: EdgeInsets.zero,
-            checkboxShape: ContinuousRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-            value: widget.checkBoxValues[index],
-            onChanged: (value) {
-              setState(() {
-                widget.checkBoxValues[index] = value!;
-              });
-            },
-            title: CachedNetworkImage(
-              imageUrl: widget.logos[index],
-              imageBuilder: (context, imageProvider) => Container(
-                decoration: BoxDecoration(
-                  image: DecorationImage(
-                    image: imageProvider,
-                    fit: BoxFit.cover,
-                    colorFilter:
-                        const ColorFilter.mode(Colors.red, BlendMode.colorBurn),
+      child: Directionality(
+        textDirection: TextDirection.ltr,
+        child: GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          padding: EdgeInsets.zero,
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 3,
+            crossAxisSpacing: 0, // Reduced spacing between columns
+            mainAxisSpacing: 0, // Reduced spacing between rows
+            childAspectRatio: 3 / 1,
+          ),
+          itemCount: widget.checkBoxValues.length,
+          itemBuilder: (context, index) {
+            return CheckboxListTile(
+              side: const BorderSide(color: Colors.grey),
+              visualDensity: VisualDensity.standard,
+              activeColor: AppColors.orangeColor,
+              checkColor: AppColors.whiteColor,
+              dense: false,
+              contentPadding: EdgeInsets.zero,
+              checkboxShape: ContinuousRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              value: widget.checkBoxValues[index],
+              onChanged: (value) {
+                setState(() {
+                  widget.checkBoxValues[index] = value!;
+                });
+              },
+              title: CachedNetworkImage(
+                imageUrl: widget.logos[index],
+                imageBuilder: (context, imageProvider) => Container(
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                      image: imageProvider,
+                      fit: BoxFit.cover,
+                      colorFilter: const ColorFilter.mode(
+                          Colors.red, BlendMode.colorBurn),
+                    ),
                   ),
                 ),
-              ),
-              placeholder: (context, url) => const Center(
-                child: Text('Loading...'),
-              ),
-              errorWidget: (context, url, error) => Image(
-                image: AssetImage(
-                  ImagesConstants.gree,
+                placeholder: (context, url) => const Center(
+                  child: Text('Loading...'),
                 ),
-                width: 200.w,
-                height: 80.h,
-                fit: BoxFit.scaleDown,
+                errorWidget: (context, url, error) => Image(
+                  image: AssetImage(
+                    ImagesConstants.gree,
+                  ),
+                  width: 200.w,
+                  height: 80.h,
+                  fit: BoxFit.scaleDown,
+                ),
               ),
-            ),
-            controlAffinity: ListTileControlAffinity.trailing,
-          );
-        },
+              controlAffinity: ListTileControlAffinity.trailing,
+            );
+          },
+        ),
       ),
     );
   }
