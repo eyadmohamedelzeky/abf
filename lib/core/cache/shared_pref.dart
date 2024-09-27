@@ -10,7 +10,8 @@ class SharedPreferencesService {
   static Future<void> storeUserModel(LoginResponseModel user) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(userKey, jsonEncode(user.toJson()));
-    await storeAccessToken(user.data!.token!);  // Optional: Save token separately
+    await storeAccessToken(
+        user.data!.token!); // Optional: Save token separately
   }
 
   // Retrieve the user model from SharedPreferences

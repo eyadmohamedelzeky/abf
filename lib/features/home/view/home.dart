@@ -148,9 +148,12 @@ class _HomeScreenState extends State<HomeScreen> {
           listener: (context, state) {},
           builder: (context, state) {
             final home = HomeController.get(context);
-            if (state is HomeLoadingState) {
-              return const Center(
-                child: CircularProgressIndicator(),
+            if (state is HomeLoadingState ||
+                state is ProductByCategoryLoadingState ||
+                state is HomeSilderLoadingState ||
+                state is FavouriteProductsLoadingState) {
+              return Center(
+                child: spinkit,
               );
             }
             return SingleChildScrollView(
@@ -232,8 +235,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                 });
                               },
                             ),
-                            itemCount: home.homeSilderResponse.data?.length ??
-                                0, // Default to 0 if null
+                            itemCount:
+                                home.homeSilderResponse.data?.length ?? 0,
                             itemBuilder: (context, index, realIndex) {
                               if (home.homeSilderResponse.data != null &&
                                   index <

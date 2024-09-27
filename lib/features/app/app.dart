@@ -13,6 +13,7 @@ import 'package:abf_ather/features/home/controller/home_controller.dart';
 import 'package:abf_ather/features/home/view/home.dart';
 import 'package:abf_ather/features/product_details/controller/product_details_controller.dart';
 import 'package:abf_ather/features/product_details/view/product_category.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -28,9 +29,13 @@ class ABFApp extends StatelessWidget {
       minTextAdapt: true,
       splitScreenMode: true,
       builder: (_, child) {
-        return Directionality(
-          textDirection: TextDirection.rtl,
-          child: MultiBlocProvider(
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          localizationsDelegates: context.localizationDelegates,
+          supportedLocales: context.supportedLocales,
+          locale: context.locale,
+          // textDirection: TextDirection.rtl,
+          home: MultiBlocProvider(
             providers: [
               BlocProvider(create: (context) => AuthController()),
               BlocProvider(
