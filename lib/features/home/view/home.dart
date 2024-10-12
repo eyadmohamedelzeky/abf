@@ -4,7 +4,6 @@ import 'package:abf_ather/core/constants/app_constants.dart';
 import 'package:abf_ather/core/widgets/CutsomTextHeader.dart';
 import 'package:abf_ather/core/widgets/custom_list_view.dart';
 import 'package:abf_ather/core/widgets/custom_text.dart';
-import 'package:abf_ather/features/auth/model/login_response_model.dart';
 import 'package:abf_ather/features/home/controller/home_controller.dart';
 import 'package:abf_ather/features/home/controller/home_state.dart';
 import 'package:abf_ather/features/product_details/view/product_category.dart';
@@ -22,16 +21,12 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  LoginResponseModel? userModel;
-
   int _selectedIndex = 0;
-
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
   }
-
   List<String> imagePaths = [
     ImagesConstants.personWithAbf,
     ImagesConstants.personWithAbf,
@@ -49,7 +44,6 @@ class _HomeScreenState extends State<HomeScreen> {
     HomeController.get(context).getProductBrands();
     HomeController.get(context).getFavouriteProducts();
     pageController = PageController();
-
     pageController!.addListener(() {
       setState(() {
         currentIndex = pageController!.page!.round();
