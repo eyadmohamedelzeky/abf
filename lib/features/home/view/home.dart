@@ -1,13 +1,13 @@
 import 'package:abf_ather/core/colors/app_colors.dart';
 import 'package:abf_ather/core/constants/app_constants.dart';
 import 'package:abf_ather/features/business/view/business_screen.dart';
+import 'package:abf_ather/features/cart/controller/card_controller.dart';
 import 'package:abf_ather/features/cart/view/cart_screen.dart';
 import 'package:abf_ather/features/home/controller/home_controller.dart';
 import 'package:abf_ather/features/home/view/home_page.dart';
 import 'package:abf_ather/features/more/view/more_screen.dart';
 import 'package:abf_ather/features/projects/view/project_screen.dart';
 import 'package:flutter/material.dart';
-
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -62,7 +62,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   image: AssetImage(ImagesConstants.home),
                   height: 25,
                   width: 25,
-                  color: getIconColor(0), // Set icon color based on selection
+                  color: getIconColor(0),
                 ),
                 label: 'الرئيسية',
               ),
@@ -73,8 +73,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       image: AssetImage(ImagesConstants.shopping),
                       height: 25,
                       width: 25,
-                      color:
-                          getIconColor(1), // Set icon color based on selection
+                      color: getIconColor(1),
                     ),
                     Positioned(
                       right: 0,
@@ -89,9 +88,9 @@ class _HomeScreenState extends State<HomeScreen> {
                           minWidth: 12,
                           minHeight: 12,
                         ),
-                        child: const Text(
-                          '3', // Replace with dynamic value if needed
-                          style: TextStyle(
+                        child: Text(
+                          '${CardController.get(context).cardProductsResponse?.data?.cartProducts?.length ?? 0}',
+                          style: const TextStyle(
                             color: Colors.white,
                             fontSize: 8,
                           ),
@@ -142,6 +141,3 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
-
-
-
