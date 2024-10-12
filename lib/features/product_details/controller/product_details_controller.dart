@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:abf_ather/core/app_varaible/app_varabile.dart';
 import 'package:abf_ather/core/services/filter_service.dart';
 import 'package:abf_ather/features/product_details/controller/product_details_state.dart';
@@ -15,6 +17,7 @@ class ProductDetailsController extends Cubit<ProductDetailsState> {
   List<bool> logoChecked = [];
   void toggleLogoChecked(bool checked, int index) {
     logoChecked[index] = checked;
+    log('logoChecked in controller : $logoChecked');
     emit(ToggleCheckBoxState());
   }
 
@@ -57,5 +60,4 @@ class ProductDetailsController extends Cubit<ProductDetailsState> {
       );
     });
   }
-  
 }
