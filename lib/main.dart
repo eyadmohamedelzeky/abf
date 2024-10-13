@@ -13,7 +13,6 @@ void main() async {
   await EasyLocalization.ensureInitialized();
   DioHelper.init();
   Bloc.observer = MyBlocObserver();
-  // Check if the user is already logged in
   var userModel = await SharedPreferencesService.getUserModel();
   runApp(EasyLocalization(
       supportedLocales: const [Locale('en'), Locale('de')],

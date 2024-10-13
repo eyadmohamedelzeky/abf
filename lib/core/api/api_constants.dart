@@ -1,6 +1,7 @@
 class ApiConstants {
   static const String baseUrl = 'https://albakr-ac.com';
   static const String cartProducts = '/api/cart';
+  static const String business = '/api/works';
   static const String allProjects = '/api/project/categories';
   static const String login = '/api/login';
   static const String register = '/api/register';

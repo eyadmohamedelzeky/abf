@@ -1,3 +1,4 @@
+import 'package:abf_ather/core/app_varaible/app_varabile.dart';
 import 'package:abf_ather/core/colors/app_colors.dart';
 import 'package:abf_ather/features/cart/controller/card_controller.dart';
 import 'package:abf_ather/features/cart/controller/cart_state.dart';
@@ -28,15 +29,20 @@ class _CartScreenState extends State<CartScreen> {
         final card = CardController.get(context);
         return Scaffold(
           body: SafeArea(
-              child: ListView.builder(
-                  itemCount:
-                      card.cardProductsResponse?.data?.cartProducts?.length,
-                  itemBuilder: (context, index) {
-                    return CustomCardProduct(
-                      cardProductsResponse: card.cardProductsResponse!,
-                      index: index,
-                    );
-                  })),
+              child: state is CardLoadingState
+                  ? spinkit
+                  : ListView.builder(
+                      itemCount:
+                          card.cardProductsResponse?.data?.cartProducts?.length,
+                      itemBuilder: (context, index) {
+                        return CustomCardProduct(
+                          cardProductsResponse:
+                              card.cardProductsResponse != null
+                                  ? card.cardProductsResponse!
+                                  : CardProductsResponse(),
+                          index: index,
+                        );
+                      })),
         );
       },
     );

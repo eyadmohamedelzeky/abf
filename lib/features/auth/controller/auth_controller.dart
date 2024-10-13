@@ -1,5 +1,6 @@
 import 'dart:developer';
 import 'package:abf_ather/core/app_varaible/app_varabile.dart';
+import 'package:abf_ather/core/cache/shared_pref.dart';
 import 'package:abf_ather/core/services/auth_service/check_otp.dart';
 import 'package:abf_ather/core/services/auth_service/complete_register_service.dart';
 import 'package:abf_ather/core/services/auth_service/login_service.dart';
@@ -71,10 +72,10 @@ class AuthController extends Cubit<AuthState> {
     emit(LoginLoadingState());
     await LoginApiService.login(request: request)
         .then((loginResponseModel) async {
-      // Save the token to Hive
       loginResponseModel = loginResponseModel;
       log('loginResponseModel after Login is : ${loginResponseModel.toJson()}');
-      updateUserModel(loginResponseModel);
+      await updateUserModel(loginResponseModel);
+      await SharedPreferencesService.storeUserModel(loginResponseModel);
       emit(LoginSuccessState());
     }).catchError((error) {
       String cleanMessage = formatErrorMessage(error.toString());
@@ -82,6 +83,7 @@ class AuthController extends Cubit<AuthState> {
       emit(LoginErrorState(error: error.toString()));
     });
   }
+
   SendOtpResponse? sendOtpResponse;
   Future<void> sendOtp() async {
     emit(SendOtpLoadingState());
