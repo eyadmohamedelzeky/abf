@@ -73,3 +73,5 @@ class FavouriteProductsErrorState extends HomeState {
 
   FavouriteProductsErrorState({required this.error});
 }
+
+class ChangeIsSearchingState extends HomeState {}

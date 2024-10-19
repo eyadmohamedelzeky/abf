@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'dart:developer';
 import 'package:abf_ather/core/api/api_constants.dart';
-import 'package:abf_ather/core/helpers/hive_helper.dart';
+import 'package:abf_ather/core/cache/shared_pref.dart';
 import 'package:bot_toast/bot_toast.dart';
 import 'package:dio/dio.dart';
 
@@ -97,12 +97,10 @@ import 'package:dio/dio.dart';
 //     return null;
 //   }
 
-
 //   static String _handleResponse(Response response) {
 //     return response.statusMessage ?? "Unknown error";
 //   }
 // }
-
 
 class DioHelper {
   static Dio? dio;
@@ -128,7 +126,9 @@ class DioHelper {
     required String path,
     Map<String, dynamic>? queryParameters,
   }) async {
-    String? token = await HiveHelper.getFromHive(key: 'token'); // Retrieve token from Hive
+    var user = await SharedPreferencesService
+        .getUserModel(); // Retrieve token from Hive
+    log('user is $user');
     try {
       final response = await dio!.get(
         path,
@@ -136,7 +136,9 @@ class DioHelper {
         options: Options(
           validateStatus: (_) => true,
           headers: {
-            'Authorization': token != null ? 'Bearer $token' : '',
+            'Authorization': user != null && user.data?.token != null
+                ? 'Bearer ${user.data?.token}'
+                : '',
             'Accept': 'application/json',
             'Accept-Language': 'ar',
           },
@@ -161,7 +163,8 @@ class DioHelper {
     dynamic data,
     Map<String, dynamic>? headers,
   }) async {
-    String? token = await HiveHelper.getFromHive(key: 'token'); // Retrieve token from Hive
+    var user = await SharedPreferencesService
+        .getUserModel(); // Retrieve token from Hive
     try {
       final response = await dio!.post(
         path,
@@ -170,7 +173,9 @@ class DioHelper {
           validateStatus: (_) => true,
           contentType: 'application/json',
           headers: {
-            'Authorization': token != null ? 'Bearer $token' : '',
+            'Authorization': user != null && user.data?.token != null
+                ? 'Bearer $user.data?.token'
+                : '',
             'Accept': 'application/json',
           }..addAll(headers ?? {}),
           followRedirects: false,

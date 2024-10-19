@@ -1,6 +1,6 @@
 import 'dart:developer';
 import 'package:abf_ather/core/app_varaible/app_varabile.dart';
-import 'package:abf_ather/core/helpers/hive_helper.dart';
+import 'package:abf_ather/core/cache/shared_pref.dart';
 import 'package:abf_ather/core/services/auth_service/check_otp.dart';
 import 'package:abf_ather/core/services/auth_service/complete_register_service.dart';
 import 'package:abf_ather/core/services/auth_service/login_service.dart';
@@ -21,7 +21,6 @@ import 'package:abf_ather/features/auth/model/send_otp_response.dart';
 import 'package:abf_ather/features/auth/view/complete_profile.dart';
 import 'package:abf_ather/features/auth/view/login.dart';
 import 'package:abf_ather/features/auth/view/verfiy_code_for_register.dart';
-import 'package:abf_ather/features/home/view/home.dart';
 import 'package:abf_ather/helper/toast_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -73,33 +72,17 @@ class AuthController extends Cubit<AuthState> {
     emit(LoginLoadingState());
     await LoginApiService.login(request: request)
         .then((loginResponseModel) async {
-      // Save the token to Hive
-      await HiveHelper.addToHive(
-          key: 'token', value: loginResponseModel.data?.token ?? '');
-
+      loginResponseModel = loginResponseModel;
+      log('loginResponseModel after Login is : ${loginResponseModel.toJson()}');
+      await updateUserModel(loginResponseModel);
+      await SharedPreferencesService.storeUserModel(loginResponseModel);
       emit(LoginSuccessState());
-      await Navigator.pushReplacementNamed(context, HomeScreen.id);
     }).catchError((error) {
       String cleanMessage = formatErrorMessage(error.toString());
       ToastHelper.showToast(msg: cleanMessage, gravity: ToastGravity.BOTTOM);
       emit(LoginErrorState(error: error.toString()));
     });
   }
-
-  // Future<void> login(BuildContext context,
-  //     {required LoginRequestModel request}) async {
-  //   emit(LoginLoadingState());
-  //   await LoginApiService.login(request: request)
-  //       .then((loginResponseModel) async {
-  //     emit(LoginSuccessState());
-  //     await Navigator.pushReplacementNamed(context, HomeScreen.id);
-  //   }).catchError((error) {
-  //     String cleanMessage = formatErrorMessage(error.toString());
-  //     ToastHelper.showToast(msg: cleanMessage, gravity: ToastGravity.BOTTOM);
-
-  //     emit(LoginErrorState(error: error.toString()));
-  //   });
-  // }
 
   SendOtpResponse? sendOtpResponse;
   Future<void> sendOtp() async {
@@ -203,20 +186,3 @@ class AuthController extends Cubit<AuthState> {
     });
   }
 }
-
-
-
-//  await authController.resetPassword(
-//                                       context,
-//                                       request: ResetPasswordRequest(
-//                                           password: authController
-//                                               .passwordController.text,
-//                                           passwordConfirmation: authController
-//                                               .confirmPasswordForCompleteProfile
-//                                               .text,
-//                                           email: authController
-//                                               .emailController.text,
-//                                           otp: authController
-//                                               .pinCodeForForgetPasswordController
-//                                               .text),
-//                                     );

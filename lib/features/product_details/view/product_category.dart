@@ -150,11 +150,11 @@ class CustomAppBarForProductCardItem extends StatelessWidget {
           onTap: () {
             showBottomSheet(
               shape: OutlineInputBorder(
-                borderSide: BorderSide.none,
+                borderSide: const BorderSide(color: Colors.grey, width: 1),
                 borderRadius: BorderRadius.circular(20.r),
               ),
               backgroundColor: Colors.white,
-              elevation: 7,
+              // elevation: .2,
               context: context,
               builder: (context) {
                 return BlocConsumer<ProductDetailsController,
@@ -197,7 +197,7 @@ class CustomAppBarForProductCardItem extends StatelessWidget {
                               ),
                               logos: controller.productBrandsResponse.data!
                                   .map((e) => e.image!)
-                                  .toList(),
+                                  .toList(),  
                             ),
                             Divider(
                               color: AppColors.greyColor,
@@ -344,7 +344,8 @@ class CustomAppBarForProductCardItem extends StatelessWidget {
                                               .toList()[i]!);
                                         }
                                       }
-
+                                      log('logoChecked: ${productDetailsController.logoChecked}');
+                                      log("selectedBrandIds: $selectedBrandIds");
                                       // Check if any essential data is missing or invalid
                                       if (selectedBrandIds.isEmpty) {
                                         // Optionally, show a message to the user

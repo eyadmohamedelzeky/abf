@@ -25,7 +25,11 @@ class HomeController extends Cubit<HomeState> {
       ProductDetailsResponseModel();
   ProductByCategoryResponseModel productByCategoryResponse =
       ProductByCategoryResponseModel();
-
+bool isSearching=false;
+void changeIsSearching(){
+  isSearching=!isSearching;
+  emit(ChangeIsSearchingState());
+}
   Future<void> getHomeSilder() async {
     emit(HomeSilderLoadingState());
     await ApiHome.getHomeSilder().then((value) {

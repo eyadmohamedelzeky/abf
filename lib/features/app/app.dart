@@ -9,10 +9,12 @@ import 'package:abf_ather/features/auth/view/new_password_screen.dart';
 import 'package:abf_ather/features/auth/view/register_new_account.dart';
 import 'package:abf_ather/features/auth/view/verfiy_code_for_forget_password.dart';
 import 'package:abf_ather/features/auth/view/verfiy_code_for_register.dart';
+import 'package:abf_ather/features/cart/controller/card_controller.dart';
 import 'package:abf_ather/features/home/controller/home_controller.dart';
 import 'package:abf_ather/features/home/view/home.dart';
 import 'package:abf_ather/features/product_details/controller/product_details_controller.dart';
 import 'package:abf_ather/features/product_details/view/product_category.dart';
+import 'package:abf_ather/features/projects/controller/project_controller.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -46,6 +48,8 @@ class ABFApp extends StatelessWidget {
               BlocProvider(
                 create: (context) => AskPriceController()..askPriceDropDown(),
               ),
+              BlocProvider(create: (context) => CardController()),
+              BlocProvider(create: (context) => ProjectController()),
             ],
             child: MaterialApp(
               debugShowCheckedModeBanner: false,
