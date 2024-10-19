@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'package:abf_ather/bloc_observer.dart';
 import 'package:abf_ather/core/cache/shared_pref.dart';
 import 'package:abf_ather/features/app/app.dart';
@@ -14,6 +15,7 @@ void main() async {
   DioHelper.init();
   Bloc.observer = MyBlocObserver();
   var userModel = await SharedPreferencesService.getUserModel();
+  log('UserModel: ${userModel?.toJson()}');
   runApp(EasyLocalization(
       supportedLocales: const [Locale('en'), Locale('de')],
       path: 'assets/translations',

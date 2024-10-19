@@ -1,4 +1,5 @@
 import 'package:abf_ather/core/app_varaible/app_varabile.dart';
+import 'package:abf_ather/core/cache/shared_pref.dart';
 import 'package:abf_ather/core/colors/app_colors.dart';
 import 'package:abf_ather/core/constants/app_constants.dart';
 import 'package:abf_ather/core/widgets/custom_list_view.dart';
@@ -15,7 +16,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class HomePageScreen extends StatefulWidget {
   const HomePageScreen({super.key});
-static const String homePageScreen = '/HomePageScreen';
+  static const String homePageScreen = '/HomePageScreen';
   @override
   State<HomePageScreen> createState() => _HomePageScreenState();
 }
@@ -29,8 +30,14 @@ class _HomePageScreenState extends State<HomePageScreen> {
   ];
   PageController? pageController;
   int currentIndex = 0;
+  var userModel;
+  void getUserData() async {
+    userModel = await SharedPreferencesService.getUserModel();
+  }
+
   @override
   void initState() {
+    getUserData();
     pageController = PageController();
     pageController!.addListener(() {
       setState(() {
@@ -64,24 +71,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
                     child: Row(
                       children: [
                         InkWell(
-                          onTap: () async {
-                            // var whatsappEntry =
-                            //     home.soicalResponseModel.data?.firstWhere(
-                            //   (e) => e.name?.toLowerCase() == 'whatsapp',
-                            //   // Handle if no entry found
-                            // );
-                            // log("whatsappEntry.toString(): $whatsappEntry");
-                            // String whatsappUrl = whatsappEntry?.url ?? '';
-
-                            // if (whatsappUrl.isNotEmpty &&
-                            //     await canLaunchUrl(Uri.parse(whatsappUrl))) {
-                            //   await launchUrl(Uri.parse(whatsappUrl),
-                            //       mode: LaunchMode
-                            //           .externalApplication); // Ensures it opens in browser or app
-                            // } else {
-                            //   throw "Could not launch $whatsappUrl";
-                            // }
-                          },
+                          onTap: () async {},
                           child: CircleAvatar(
                             radius: 20.r,
                             backgroundColor: Colors.green,
@@ -105,12 +95,14 @@ class _HomePageScreenState extends State<HomePageScreen> {
                           ),
                         ),
                         const Spacer(),
-                        CustomText(
-                          text:
-                              'مرحبا , ${userModel?.data?.fName ?? 'Guest '} ',
-                          fontSize: 18.sp,
-                          fontWeight: FontWeight.w600,
-                        )
+                        userModel != null
+                            ? CustomText(
+                                text:
+                                    'مرحبا , ${userModel?.data?.fName ?? 'Guest '} ',
+                                fontSize: 18.sp,
+                                fontWeight: FontWeight.w600,
+                              )
+                            : const CircularProgressIndicator.adaptive(),
                       ],
                     ),
                   ),
